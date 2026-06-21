@@ -1,5 +1,9 @@
 # SciPhys OS
 
+[![CI](https://github.com/sciphys-ai/sciphys-os/actions/workflows/ci.yml/badge.svg)](https://github.com/sciphys-ai/sciphys-os/actions/workflows/ci.yml)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](./LICENSE)
+[![XRD benchmark](https://img.shields.io/badge/XRD%20benchmark-8%2F8%20passing-0e8a16.svg)](https://github.com/sciphys-ai/sciphys-os)
+
 Open scientific data infrastructure for experimental materials and physics.
 
 SciPhys OS is the open core behind [SciPhys.ai](https://www.sciphys.com): parsers,
@@ -41,12 +45,12 @@ This repository is the first public package in the SciPhys open stack.
 
 Planned open modules:
 
-- `sciphys-core`: parser and analysis primitives.
-- `sciphys-formats`: open schemas for samples, measurements, instruments,
+- [sciphys-os](https://github.com/sciphys-ai/sciphys-os): parser and analysis primitives.
+- [sciphys-formats](https://github.com/sciphys-ai/sciphys-formats): open schemas for samples, measurements, instruments,
   analysis results, provenance, and expert feedback.
-- `sciphys-bench`: benchmark datasets for XRD, Raman, SEM, AFM, spectroscopy,
+- [sciphys-bench](https://github.com/sciphys-ai/sciphys-bench): benchmark datasets for XRD, Raman, SEM, AFM, spectroscopy,
   and battery data.
-- `sciphys-recipes`: reproducible notebooks for common research workflows.
+- [sciphys-recipes](https://github.com/sciphys-ai/sciphys-recipes): reproducible notebooks for common research workflows.
 
 For now, these pieces live together here so the community can move quickly.
 
@@ -111,6 +115,13 @@ The most valuable contributions right now are:
 - bug reports where a parser or phase match fails on a real file.
 
 Start with [CONTRIBUTING.md](./CONTRIBUTING.md) and [ROADMAP.md](./ROADMAP.md).
+
+Open starter issues:
+
+- [Collect anonymized XRD benchmark cases](https://github.com/sciphys-ai/sciphys-os/issues/1)
+- [Improve Bruker RAW v4 coverage](https://github.com/sciphys-ai/sciphys-os/issues/2)
+- [Draft SciPhysData v0.1 schema](https://github.com/sciphys-ai/sciphys-os/issues/3)
+- [Add a reproducible ZnO XRD recipe](https://github.com/sciphys-ai/sciphys-os/issues/4)
 
 ## Data and Privacy
 
