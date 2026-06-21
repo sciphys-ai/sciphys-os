@@ -1,7 +1,7 @@
 {
   "name": "sciphys-os",
   "version": "0.1.0",
-  "description": "Open-source parsers, benchmarks and basic XRD tools from SciPhys.",
+  "description": "Open scientific data parsers, benchmarks, and XRD analysis primitives from SciPhys.",
   "license": "Apache-2.0",
   "type": "commonjs",
   "main": "dist/src/index.js",
@@ -18,12 +18,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/Leon-Drq/sciphys-os.git"
+    "url": "git+ssh://git@github.com/sciphys-ai/sciphys-os.git"
   },
   "bugs": {
-    "url": "https://github.com/Leon-Drq/sciphys-os/issues"
+    "url": "https://github.com/sciphys-ai/sciphys-os/issues"
   },
-  "homepage": "https://github.com/Leon-Drq/sciphys-os#readme",
+  "homepage": "https://github.com/sciphys-ai/sciphys-os#readme",
   "engines": {
     "node": ">=20.9.0",
     "pnpm": ">=9"

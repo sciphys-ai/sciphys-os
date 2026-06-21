@@ -1,0 +1,35 @@
+name: Benchmark contribution
+description: Propose a new benchmark case for experimental data analysis.
+title: "[Benchmark]: "
+labels: ["benchmark", "dataset"]
+body:
+  - type: input
+    id: modality
+    attributes:
+      label: Modality
+      placeholder: "XRD, Raman, SEM, AFM, spectroscopy, battery"
+    validations:
+      required: true
+  - type: textarea
+    id: scientific_case
+    attributes:
+      label: What scientific challenge does this case represent?
+      placeholder: "Example: low-SNR ZnO, BiFeO3 with impurity peaks, substrate contamination"
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected result
+      description: Include expected phase, artifacts, labels, or metrics.
+    validations:
+      required: true
+  - type: checkboxes
+    id: provenance
+    attributes:
+      label: Provenance and privacy
+      options:
+        - label: The data is public, synthetic, or approved for public release.
+          required: true
+        - label: I can provide source/provenance notes for this case.
+          required: true

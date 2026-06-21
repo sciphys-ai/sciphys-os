@@ -1,0 +1,35 @@
+name: Instrument parser request
+description: Request support for an instrument file format or variant.
+title: "[Parser]: "
+labels: ["parser", "format-support"]
+body:
+  - type: input
+    id: instrument
+    attributes:
+      label: Instrument / vendor
+      placeholder: "Example: Bruker D8, Rigaku SmartLab, PANalytical Empyrean"
+    validations:
+      required: true
+  - type: input
+    id: extension
+    attributes:
+      label: File extension
+      placeholder: ".raw, .xrdml, .xy, .csv"
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: Format details
+      description: Include version, export settings, and any known metadata fields.
+    validations:
+      required: true
+  - type: checkboxes
+    id: fixture
+    attributes:
+      label: Fixture availability
+      options:
+        - label: I can provide a public, synthetic, or anonymized fixture.
+          required: false
+        - label: I have removed private sample, operator, institution, and project metadata.
+          required: false
