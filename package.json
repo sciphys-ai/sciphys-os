@@ -24,9 +24,10 @@
     "build": "tsc -p tsconfig.json",
     "regression:xrd": "pnpm build && node dist/scripts/xrd-benchmark.js",
     "regression:evidence": "pnpm build && node dist/scripts/evidence-regression.js",
+    "regression:plugin": "pnpm build && node dist/scripts/plugin-regression.js",
     "benchmark:xrd": "pnpm regression:xrd",
     "validate:repo": "python scripts/validate-repository.py",
-    "test": "pnpm build && node dist/scripts/xrd-benchmark.js && node dist/scripts/evidence-regression.js"
+    "test": "pnpm build && node dist/scripts/xrd-benchmark.js && node dist/scripts/evidence-regression.js && node dist/scripts/plugin-regression.js"
   },
   "repository": {
     "type": "git",

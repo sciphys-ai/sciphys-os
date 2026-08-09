@@ -99,11 +99,15 @@ def validate_registry() -> None:
         plugin = load_json(path)
         if not isinstance(plugin, dict):
             continue
-        for field in ("id", "version", "kind", "status", "maintainers", "capabilities", "license"):
+        for field in ("protocolVersion", "id", "version", "kind", "status", "maintainers", "capabilities", "runtime", "operations", "license"):
             if field not in plugin:
                 fail(f"{path.relative_to(ROOT)}: missing {field}")
         if not plugin.get("capabilities"):
             fail(f"{path.relative_to(ROOT)}: capabilities must not be empty")
+        operation_capabilities = {operation.get("capability") for operation in plugin.get("operations", []) if isinstance(operation, dict)}
+        missing_operations = set(plugin.get("capabilities", [])) - operation_capabilities
+        if missing_operations:
+            fail(f"{path.relative_to(ROOT)}: capabilities without operations: {sorted(missing_operations)}")
 
 
 def main() -> int:

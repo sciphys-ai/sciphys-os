@@ -1,6 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "$id": "https://schemas.sciphys.org/evidence-bundle/v0.1.json",
+  "x-sciphys-source": "https://github.com/sciphys-ai/sciphys-formats/blob/main/schemas/evidence-bundle.v0.1.schema.json",
   "title": "SciPhys Evidence Bundle v0.1",
   "type": "object",
   "additionalProperties": false,

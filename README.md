@@ -20,6 +20,7 @@ pnpm install
 pnpm build
 node dist/scripts/sciphys.js xrd inspect examples/zno.xy
 node dist/scripts/sciphys.js evidence validate examples/evidence-bundle.example.json
+node dist/scripts/sciphys.js plugin validate registry/plugins/xrd-core.json
 ```
 
 Install or inspect the agent Skills with any compatible Skills client:
@@ -53,7 +54,7 @@ The boundaries are explicit:
 | Skills | Analyze, plot, write, audit | Orchestrate tools without duplicating science code |
 | Evaluation | Regression, capability, scientific-validity suites | Public tasks plus governed hidden test sets |
 
-See [architecture](docs/ARCHITECTURE.md), [interoperability](docs/INTEROPERABILITY.md), and the [plugin manifest](specs/plugin-manifest.schema.json).
+See [architecture](docs/ARCHITECTURE.md), [interoperability](docs/INTEROPERABILITY.md), and the [plugin manifest](specs/plugin-manifest.schema.json). Every declared capability maps to an explicit runtime operation and handler, so registry entries can be validated before loading.
 
 ## Included today
 

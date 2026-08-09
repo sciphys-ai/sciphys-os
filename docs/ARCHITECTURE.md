@@ -38,7 +38,8 @@ raw data, normalized measurements, processes, results, artifacts, and external
 references. Edges record how inputs were used and outputs were generated or
 derived. Claims cite node IDs instead of relying on prose-only citations.
 
-The v0.1 contract lives in `specs/evidence-bundle.schema.json` and the runtime
+The authoritative v0.1 contract lives in `sciphys-formats`. A synchronized
+offline mirror lives in `specs/evidence-bundle.schema.json`, and the runtime
 validator lives in `src/evidence-bundle.ts`.
 
 ## Extension model

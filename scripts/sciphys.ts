@@ -1,14 +1,15 @@
 #!/usr/bin/env node
 
 import { createHash } from "node:crypto"
-import { readFileSync } from "node:fs"
-import { basename } from "node:path"
+import { existsSync, readFileSync } from "node:fs"
+import { basename, dirname, resolve } from "node:path"
 import { detectPeaks, parseXRD, twoThetaToDSpacing, type XRDPeak } from "../src/xrd-parser"
 import { identifyReferencePhases } from "../src/xrd-reference-library"
 import { validateEvidenceBundle, type EvidenceBundle } from "../src/evidence-bundle"
+import { validatePluginManifest, type PluginManifest, type PluginValidationIssue } from "../src/plugin-manifest"
 
 function usage(): never {
-  console.error("Usage:\n  sciphys xrd inspect <file> [material hint]\n  sciphys evidence validate <bundle.json>")
+  console.error("Usage:\n  sciphys xrd inspect <file> [material hint]\n  sciphys evidence validate <bundle.json>\n  sciphys plugin validate <manifest.json>")
   process.exit(2)
 }
 
@@ -59,6 +60,30 @@ if (group === "xrd" && command === "inspect") {
   const report = validateEvidenceBundle(bundle)
   console.log(JSON.stringify(report, null, 2))
   if (!report.valid) process.exitCode = 1
+} else if (group === "plugin" && command === "validate") {
+  const manifest: unknown = JSON.parse(readFileSync(inputPath, "utf8"))
+  const report = validatePluginManifest(manifest)
+  const runtimeIssues: PluginValidationIssue[] = []
+  if (report.valid) {
+    const typedManifest = manifest as PluginManifest
+    if (typedManifest.runtime.kind === "node") {
+      const entrypoint = resolve(dirname(inputPath), typedManifest.runtime.entrypoint)
+      if (!existsSync(entrypoint)) {
+        runtimeIssues.push({ path: "runtime.entrypoint", code: "entrypoint-not-found", message: `Node entrypoint not found: ${entrypoint}` })
+      } else {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const implementation = require(entrypoint) as Record<string, unknown>
+        for (const [index, operation] of typedManifest.operations.entries()) {
+          if (typeof implementation[operation.handler] !== "function") {
+            runtimeIssues.push({ path: `operations[${index}].handler`, code: "handler-not-found", message: `Export ${operation.handler} was not found in ${entrypoint}.` })
+          }
+        }
+      }
+    }
+  }
+  const result = { valid: report.valid && runtimeIssues.length === 0, issues: [...report.issues, ...runtimeIssues] }
+  console.log(JSON.stringify(result, null, 2))
+  if (!result.valid) process.exitCode = 1
 } else {
   usage()
 }

@@ -49,3 +49,4 @@ jobs:
         run: |
           node dist/scripts/sciphys.js xrd inspect examples/zno.xy
           node dist/scripts/sciphys.js evidence validate examples/evidence-bundle.example.json
+          node dist/scripts/sciphys.js plugin validate registry/plugins/xrd-core.json
