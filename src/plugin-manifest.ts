@@ -41,11 +41,20 @@ const VERSION_PATTERN = /^[0-9]+\.[0-9]+\.[0-9]+(?:-[0-9A-Za-z.-]+)?$/
 const KINDS = new Set<PluginKind>(["adapter", "primitive", "technique", "skill", "exporter"])
 const STATUSES = new Set<PluginStatus>(["experimental", "community-verified", "stable", "certified", "deprecated"])
 const RUNTIMES = new Set<PluginRuntimeKind>(["node", "python", "wasm", "container", "external"])
+const MODALITIES = new Set(["signal-1d", "time-series", "raster-2d", "volume-3d", "structure", "tabular"])
+const TOP_LEVEL_FIELDS = new Set([
+  "protocolVersion", "id", "version", "kind", "status", "techniques", "modalities", "vendors", "formats",
+  "maintainers", "capabilities", "runtime", "operations", "fixtures", "methodReferences", "license", "dataLicense",
+])
 
 export function validatePluginManifest(value: unknown): PluginValidationReport {
   const issues: PluginValidationIssue[] = []
   const issue = (path: string, code: string, message: string) => issues.push({ path, code, message })
   if (!isRecord(value)) return { valid: false, issues: [{ path: "$", code: "not-object", message: "Plugin manifest must be an object." }] }
+
+  for (const field of Object.keys(value)) {
+    if (!TOP_LEVEL_FIELDS.has(field)) issue(field, "unknown-field", `Unknown plugin manifest field ${field}.`)
+  }
 
   if (value.protocolVersion !== PLUGIN_PROTOCOL_VERSION) issue("protocolVersion", "unsupported-protocol", `Expected ${PLUGIN_PROTOCOL_VERSION}.`)
   if (typeof value.id !== "string" || !ID_PATTERN.test(value.id)) issue("id", "invalid-id", "Plugin id must be lowercase dot/dash notation.")
@@ -53,21 +62,44 @@ export function validatePluginManifest(value: unknown): PluginValidationReport {
   if (!KINDS.has(value.kind as PluginKind)) issue("kind", "invalid-kind", "Unknown plugin kind.")
   if (!STATUSES.has(value.status as PluginStatus)) issue("status", "invalid-status", "Unknown plugin maturity status.")
   if (typeof value.license !== "string" || value.license.trim() === "") issue("license", "missing-license", "Plugin license is required.")
+  for (const field of ["techniques", "vendors", "formats", "fixtures", "methodReferences"] as const) {
+    if (value[field] !== undefined && (!Array.isArray(value[field]) || value[field].some((item) => typeof item !== "string" || item.trim() === ""))) {
+      issue(field, "invalid-string-array", `${field} must contain non-empty strings.`)
+    }
+  }
+  if (value.modalities !== undefined && (!Array.isArray(value.modalities) || value.modalities.some((item) => typeof item !== "string" || !MODALITIES.has(item)))) {
+    issue("modalities", "invalid-modalities", "modalities contains an unknown modality family.")
+  }
 
   const maintainers = Array.isArray(value.maintainers) ? value.maintainers : []
   if (maintainers.length === 0 || maintainers.some((item) => !isRecord(item) || typeof item.name !== "string" || item.name.trim() === "")) {
     issue("maintainers", "invalid-maintainers", "At least one named maintainer is required.")
   }
+  for (const [index, maintainer] of maintainers.entries()) {
+    if (!isRecord(maintainer)) continue
+    for (const field of Object.keys(maintainer)) {
+      if (!["name", "orcid", "github"].includes(field)) issue(`maintainers[${index}].${field}`, "unknown-field", `Unknown maintainer field ${field}.`)
+    }
+    for (const field of ["orcid", "github"] as const) {
+      if (maintainer[field] !== undefined && typeof maintainer[field] !== "string") issue(`maintainers[${index}].${field}`, "invalid-field", `${field} must be a string.`)
+    }
+  }
 
-  const capabilities = Array.isArray(value.capabilities) ? value.capabilities.filter((item): item is string => typeof item === "string" && item.trim() !== "") : []
+  const rawCapabilities = Array.isArray(value.capabilities) ? value.capabilities : []
+  const capabilities = rawCapabilities.filter((item): item is string => typeof item === "string" && item.trim() !== "")
   if (capabilities.length === 0) issue("capabilities", "missing-capabilities", "At least one capability is required.")
+  if (capabilities.length !== rawCapabilities.length) issue("capabilities", "invalid-capability", "Capabilities must be non-empty strings.")
   if (new Set(capabilities).size !== capabilities.length) issue("capabilities", "duplicate-capability", "Capabilities must be unique.")
 
   if (!isRecord(value.runtime)) {
     issue("runtime", "missing-runtime", "Runtime declaration is required.")
   } else {
+    for (const field of Object.keys(value.runtime)) {
+      if (!["kind", "entrypoint", "engine"].includes(field)) issue(`runtime.${field}`, "unknown-field", `Unknown runtime field ${field}.`)
+    }
     if (!RUNTIMES.has(value.runtime.kind as PluginRuntimeKind)) issue("runtime.kind", "invalid-runtime", "Unknown runtime kind.")
     if (typeof value.runtime.entrypoint !== "string" || value.runtime.entrypoint.trim() === "") issue("runtime.entrypoint", "missing-entrypoint", "Runtime entrypoint is required.")
+    if (value.runtime.engine !== undefined && typeof value.runtime.engine !== "string") issue("runtime.engine", "invalid-engine", "Runtime engine must be a string.")
   }
 
   const operations = Array.isArray(value.operations) ? value.operations : []
@@ -80,6 +112,9 @@ export function validatePluginManifest(value: unknown): PluginValidationReport {
       issue(path, "invalid-operation", "Operation must be an object.")
       continue
     }
+    for (const field of Object.keys(operation)) {
+      if (!["id", "capability", "handler", "deterministic", "inputSchema", "outputSchema"].includes(field)) issue(`${path}.${field}`, "unknown-field", `Unknown operation field ${field}.`)
+    }
     if (typeof operation.id !== "string" || !ID_PATTERN.test(operation.id)) issue(`${path}.id`, "invalid-operation-id", "Operation id is invalid.")
     else if (operationIds.has(operation.id)) issue(`${path}.id`, "duplicate-operation", `Duplicate operation id ${operation.id}.`)
     else operationIds.add(operation.id)
@@ -88,6 +123,9 @@ export function validatePluginManifest(value: unknown): PluginValidationReport {
     } else coveredCapabilities.add(operation.capability)
     if (typeof operation.handler !== "string" || operation.handler.trim() === "") issue(`${path}.handler`, "missing-handler", "Operation handler is required.")
     if (typeof operation.deterministic !== "boolean") issue(`${path}.deterministic`, "missing-determinism", "Operation must declare whether it is deterministic.")
+    for (const field of ["inputSchema", "outputSchema"] as const) {
+      if (operation[field] !== undefined && typeof operation[field] !== "string") issue(`${path}.${field}`, "invalid-schema-ref", `${field} must be a string.`)
+    }
   }
   for (const capability of capabilities) {
     if (!coveredCapabilities.has(capability)) issue("operations", "unimplemented-capability", `No operation implements ${capability}.`)

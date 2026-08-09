@@ -34,4 +34,15 @@ assert.deepEqual(
   new Set(["raw-hash-required", "unknown-node", "unsupported-claim", "unknown-review-target"]),
 )
 
-console.log("Evidence Bundle regression suite: 2/2 passed")
+const malformedReport = validateEvidenceBundle({ schemaVersion: EVIDENCE_BUNDLE_SCHEMA_VERSION })
+assert.equal(malformedReport.valid, false)
+assert.deepEqual(
+  new Set(malformedReport.issues.map((issue) => issue.code)),
+  new Set(["missing-id", "invalid-date", "invalid-nodes", "invalid-edges", "invalid-claims"]),
+)
+
+const scalarReport = validateEvidenceBundle("not a bundle")
+assert.equal(scalarReport.valid, false)
+assert.equal(scalarReport.issues[0].code, "not-object")
+
+console.log("Evidence Bundle regression suite: 4/4 passed")
