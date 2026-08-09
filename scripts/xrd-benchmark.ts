@@ -13,8 +13,8 @@ function main() {
     failures: result.failures.join("; "),
   }))
 
-  console.log("\nSciPhys XRD benchmark")
-  console.log("=====================\n")
+  console.log("\nSciPhys XRD synthetic regression suite")
+  console.log("=======================================\n")
   console.table(rows)
   console.log("")
   console.log(`Cases: ${summary.passedCases}/${summary.caseCount} passed`)
@@ -24,7 +24,7 @@ function main() {
   console.log(`False-positive rate: ${formatPct(summary.falsePositiveRate)}`)
 
   if (!summary.pass) {
-    console.error("\nXRD benchmark failed. Inspect failed cases before changing phase matching.")
+    console.error("\nXRD regression failed. Inspect failed cases before changing phase matching.")
     process.exitCode = 1
   }
 }

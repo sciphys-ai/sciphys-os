@@ -1,0 +1,15 @@
+{
+  "id": "sciphys.xrd.core",
+  "version": "0.2.0",
+  "kind": "technique",
+  "status": "experimental",
+  "techniques": ["xrd"],
+  "modalities": ["signal-1d", "structure"],
+  "vendors": ["Bruker", "Rigaku", "PANalytical"],
+  "formats": ["txt", "xy", "csv", "raw-v3", "raw-v4", "xrdml"],
+  "maintainers": [{ "name": "SciPhys AI contributors", "github": "sciphys-ai" }],
+  "capabilities": ["parse", "detect-peaks", "match-reference-phases", "fit-profile", "preview-refinement"],
+  "outputSchema": "../../specs/evidence-bundle.schema.json",
+  "fixtures": ["../../examples/zno.xy"],
+  "license": "Apache-2.0"
+}

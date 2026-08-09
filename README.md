@@ -1,151 +1,138 @@
 # SciPhys OS
 
 [![CI](https://github.com/sciphys-ai/sciphys-os/actions/workflows/ci.yml/badge.svg)](https://github.com/sciphys-ai/sciphys-os/actions/workflows/ci.yml)
-[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](./LICENSE)
-[![XRD benchmark](https://img.shields.io/badge/XRD%20benchmark-8%2F8%20passing-0e8a16.svg)](https://github.com/sciphys-ai/sciphys-os)
+[![License](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
+[![Evidence Bundle](https://img.shields.io/badge/Evidence%20Bundle-v0.1-6f42c1.svg)](specs/evidence-bundle.schema.json)
 
-Open scientific data infrastructure for experimental materials and physics.
+**The open agent stack for experimental science.**
 
-SciPhys OS is the open core behind [SciPhys.ai](https://www.sciphys.com): parsers,
-schemas, benchmarks, and evidence-based analysis primitives for turning raw
-instrument files into reproducible scientific results.
+SciPhys OS turns raw instrument data into traceable analyses, reproducible figures, and evidence-grounded scientific claims. XRD is the first working vertical slice; the architecture is designed to scale across Raman, spectroscopy, SEM/TEM, AFM, thermal analysis, electrochemistry, and future community plugins.
 
-The first public release focuses on X-ray diffraction because phase
-identification is where raw files, physical models, reference patterns, and
-expert review meet.
+The durable product is not a collection of prompts. It is a shared evidence protocol connecting raw files, deterministic tools, agent Skills, evaluations, and expert review.
 
-## Why This Exists
-
-Experimental science still has a missing infrastructure layer:
-
-- instrument files are fragmented across proprietary formats;
-- AI tools usually see screenshots or copied text, not raw scientific evidence;
-- phase identification and refinement are hard to audit;
-- labs need reusable, testable, privacy-aware data pipelines.
-
-SciPhys OS aims to become the open standard layer for this workflow. The hosted
-SciPhys product adds private storage, collaboration, AI agents, expert review,
-and lab knowledge systems. This repository keeps the scientific foundation open.
-
-## What Is Included
-
-- Text XRD parser for `.txt`, `.xy`, and `.csv` two-column exports.
-- Bruker RAW v3 and v4 parser support.
-- Rigaku SmartLab RAW sniffing support.
-- PANalytical `.xrdml` parser support.
-- Curated starter reference patterns for common phases.
-- Peak/reference matching utilities.
-- Basic structure-factor pattern generation from CIF-like structure data.
-- Basic profile fitting and refinement helpers.
-- A deterministic XRD benchmark suite.
-
-## Project Direction
-
-This repository is the first public package in the SciPhys open stack.
-
-Planned open modules:
-
-- [sciphys-os](https://github.com/sciphys-ai/sciphys-os): parser and analysis primitives.
-- [sciphys-formats](https://github.com/sciphys-ai/sciphys-formats): open schemas for samples, measurements, instruments,
-  analysis results, provenance, and expert feedback.
-- [sciphys-bench](https://github.com/sciphys-ai/sciphys-bench): benchmark datasets for XRD, Raman, SEM, AFM, spectroscopy,
-  and battery data.
-- [sciphys-recipes](https://github.com/sciphys-ai/sciphys-recipes): reproducible notebooks for common research workflows.
-
-For now, these pieces live together here so the community can move quickly.
-
-## Runtime Notes
-
-The `.xrdml` parser uses `DOMParser`. It works directly in browser contexts.
-Node callers should provide a DOMParser-compatible XML implementation before
-invoking `xrdmlToText`.
-
-## Install
+## Try it
 
 ```bash
+git clone https://github.com/sciphys-ai/sciphys-os.git
+cd sciphys-os
+corepack enable
 pnpm install
+pnpm build
+node dist/scripts/sciphys.js xrd inspect examples/zno.xy
+node dist/scripts/sciphys.js evidence validate examples/evidence-bundle.example.json
 ```
 
-## Build
+Install or inspect the agent Skills with any compatible Skills client:
+
+```bash
+npx skills add sciphys-ai/sciphys-os --list
+npx skills add sciphys-ai/sciphys-os --skill analyze-instrument-data
+```
+
+The XRD command currently accepts two-column text exports. Library parsers also cover selected Bruker RAW and PANalytical XRDML variants; the CLI will expand as adapters satisfy the plugin contract.
+
+## One architecture, many instruments
+
+```mermaid
+flowchart LR
+    A["Raw instrument files"] --> B["Instrument adapters"]
+    B --> C["Deterministic scientific tools"]
+    C --> D["Evidence Bundle"]
+    D --> E["Agent Skills"]
+    D --> F["Figures and manuscripts"]
+    D --> G["Benchmarks and expert review"]
+```
+
+The boundaries are explicit:
+
+| Layer | Stable contract | How it scales |
+|---|---|---|
+| Data | SciPhysData and provenance schemas | New vendor formats map into shared types |
+| Tools | Parsers, QC, fitting, matching, transforms | Deterministic modality plugins |
+| Evidence | Nodes, lineage, claims, reviews | Common across all instruments |
+| Skills | Analyze, plot, write, audit | Orchestrate tools without duplicating science code |
+| Evaluation | Regression, capability, scientific-validity suites | Public tasks plus governed hidden test sets |
+
+See [architecture](docs/ARCHITECTURE.md), [interoperability](docs/INTEROPERABILITY.md), and the [plugin manifest](specs/plugin-manifest.schema.json).
+
+## Included today
+
+### Agent Skills
+
+- `analyze-instrument-data`: modality-neutral analysis with QC, provenance, and uncertainty.
+- `make-scientific-figure`: reproducible figure bundles and integrity checks.
+- `write-evidence-grounded-results`: manuscript prose backed by a claim ledger.
+- `audit-scientific-claims`: structural and scientific review of claim-to-evidence links.
+
+Each Skill is inspectable under [`skills/`](skills/) and keeps deterministic work in scripts or typed code.
+
+### XRD vertical slice
+
+- parsers for common text exports, selected Bruker RAW versions, and PANalytical XRDML;
+- peak detection, starter phase references, matching, profile fitting, and refinement helpers;
+- evidence-first CLI output with raw-file hash, candidate alternatives, and warnings;
+- eight synthetic regression cases for preventing code regressions.
+
+The synthetic suite is deliberately called a **regression suite**, not an external scientific benchmark. Real, licensed, expert-labeled evaluation data belongs in [sciphys-bench](https://github.com/sciphys-ai/sciphys-bench).
+
+## Evidence Bundle
+
+An Evidence Bundle is the interoperability boundary between tools and agents. It records:
+
+- immutable or content-addressed raw inputs;
+- processes, parameters, software versions, and derived artifacts;
+- directed provenance edges;
+- scientific claims classified as observations, derived results, interpretations, or hypotheses;
+- expert review decisions and rationale.
+
+Validate the [example bundle](examples/evidence-bundle.example.json):
 
 ```bash
 pnpm build
+node dist/scripts/sciphys.js evidence validate examples/evidence-bundle.example.json
 ```
 
-## Run the XRD Benchmark
+## Repository ecosystem
 
-```bash
-pnpm benchmark:xrd
-```
+- **[sciphys-os](https://github.com/sciphys-ai/sciphys-os)** — runtime, Skills, instrument adapters, evidence logic.
+- **[sciphys-formats](https://github.com/sciphys-ai/sciphys-formats)** — versioned, vendor-neutral data and evidence schemas.
+- **[sciphys-bench](https://github.com/sciphys-ai/sciphys-bench)** — benchmark protocols, governed datasets, scoring, and leaderboards.
+- **[sciphys-recipes](https://github.com/sciphys-ai/sciphys-recipes)** — executable end-to-end scientific workflows.
 
-The benchmark reports:
+The split prevents a single repository from becoming a monolith while preserving shared contracts.
 
-- top-1 phase accuracy;
-- phase recall;
-- strong-peak coverage;
-- false-positive rate;
-- per-case pass/fail reasons.
+## Evaluation model
 
-## Quick Example
+We evaluate four distinct things:
 
-```ts
-import { identifyReferencePhases, parseXRD } from "sciphys-os"
+1. deterministic code regression;
+2. agent capability and tool-use behavior;
+3. scientific validity on licensed, expert-labeled data;
+4. reproducibility and evidence completeness of end-to-end recipes.
 
-const text = "31.77 2400\n34.42 10000\n36.25 5300"
-const pattern = parseXRD(text)
+Read [evaluation](docs/EVALUATION.md). Public tests make contribution easy; versioned hidden sets reduce benchmark gaming. Dataset provenance, licenses, subgroup coverage, and expert adjudication are part of the benchmark, not paperwork around it.
 
-const peaks = pattern.points.map((point) => ({
-  twoTheta: point.twoTheta,
-  dSpacing: 1,
-  relativeIntensity: point.intensity,
-}))
+## Contributing
 
-const matches = identifyReferencePhases(peaks)
-console.log(matches[0]?.phase.formula)
-```
+You can contribute without implementing an entire modality:
 
-## Contribution Tracks
+- report a real file that an adapter cannot parse;
+- add a licensed, anonymized fixture and expected metadata;
+- improve a Skill, schema, reference provenance, or evaluation case;
+- implement one parser/QC/analysis plugin;
+- publish a reproducible recipe with an Evidence Bundle;
+- review a scientific claim or benchmark label in your domain.
 
-The most valuable contributions right now are:
+Start with [CONTRIBUTING.md](CONTRIBUTING.md), [ROADMAP.md](ROADMAP.md), and the [RFC template](rfcs/0000-template.md). Review [data licensing](DATA_LICENSES.md) before contributing any measurement or reference data.
 
-- new instrument parsers, especially real-world XRD exports;
-- anonymized benchmark cases with expected phases and known artifacts;
-- reference pattern corrections with source provenance;
-- reproducible notebooks for common materials workflows;
-- bug reports where a parser or phase match fails on a real file.
+## Open core and hosted product
 
-Start with [CONTRIBUTING.md](./CONTRIBUTING.md) and [ROADMAP.md](./ROADMAP.md).
+Open repositories contain portable schemas, local runtime primitives, Skills, public evaluation protocols, and reproducible examples. SciPhys.ai can build the managed collaboration layer: private data, permissions, compute, organizational knowledge, audit trails, expert networks, and hosted evaluations. Exportability through open Evidence Bundles prevents lock-in.
 
-Open starter issues:
+## Status
 
-- [Collect anonymized XRD benchmark cases](https://github.com/sciphys-ai/sciphys-os/issues/1)
-- [Improve Bruker RAW v4 coverage](https://github.com/sciphys-ai/sciphys-os/issues/2)
-- [Draft SciPhysData v0.1 schema](https://github.com/sciphys-ai/sciphys-os/issues/3)
-- [Add a reproducible ZnO XRD recipe](https://github.com/sciphys-ai/sciphys-os/issues/4)
+SciPhys OS is pre-1.0. XRD support is an initial proof of the architecture, not yet a universal or publication-grade analysis system. Interfaces may change through public RFCs. Do not use automated output as a substitute for domain-expert review.
 
-## Data and Privacy
+## License and citation
 
-Do not commit private lab raw files unless the lab has explicitly approved
-public release. Prefer benchmark fixtures that contain peak lists, synthetic
-signals, public reference patterns, and expected labels.
-
-If a real file is essential to reproduce a parser bug, remove personal,
-institutional, sample, and project identifiers before opening an issue.
-
-## Relationship to SciPhys.ai
-
-SciPhys.ai is the hosted workspace for private experimental data, AI-assisted
-analysis, lab collaboration, expert review, and publication-ready outputs.
-
-SciPhys OS is the open scientific foundation: formats, parsers, benchmarks, and
-evidence logic that the community can inspect and improve.
-
-## Citation
-
-If SciPhys OS helps your research, cite the repository using the metadata in
-[CITATION.cff](./CITATION.cff). A DOI-backed release will be added once the
-benchmark suite stabilizes.
-
-## License
-
-Apache-2.0.
+Code is Apache-2.0. Data and reference assets may have separate terms; see [DATA_LICENSES.md](DATA_LICENSES.md). Cite the repository using [CITATION.cff](CITATION.cff).

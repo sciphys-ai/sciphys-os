@@ -1,0 +1,4 @@
+interface:
+  display_name: "Audit Scientific Claims"
+  short_description: "Check claims against data and provenance"
+  default_prompt: "Use $audit-scientific-claims to audit this manuscript against its figures, data, and evidence references."

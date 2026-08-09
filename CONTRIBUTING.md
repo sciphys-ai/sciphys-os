@@ -1,69 +1,66 @@
 # Contributing to SciPhys OS
 
-Thank you for helping build open infrastructure for experimental science.
+SciPhys OS grows through small, reviewable scientific capabilities joined by shared contracts. A useful contribution may be a parser fixture, an evidence review, a Skill improvement, or a full instrument plugin.
 
-The project is young, so high-quality bug reports, parser fixtures, benchmark
-cases, and documentation are as valuable as code.
-
-## Development Setup
+## Set up and validate
 
 ```bash
+corepack enable
 pnpm install
 pnpm build
 pnpm test
+python scripts/validate-repository.py
 ```
 
-## Best First Contributions
+## Choose a contribution unit
 
-- Add a small anonymized XRD file that fails to parse.
-- Add a new parser fixture with expected metadata.
-- Improve a benchmark case with clearer expected phases.
-- Correct a reference peak list and cite the source.
-- Add an example notebook or TypeScript snippet.
+### Instrument adapter
 
-## Parser Contributions
+Implement the smallest pipeline stage needed: sniff, parse, normalize, QC, analyze, or export. Declare capabilities in `registry/plugins/`, preserve useful raw metadata, report ambiguity explicitly, and include fixtures for supported and rejected variants.
 
-When adding or improving an instrument parser:
+### Agent Skill
 
-- include at least one anonymized fixture;
-- preserve raw metadata when it is scientifically useful;
-- return clear error messages for unsupported variants;
-- avoid silently guessing instrument settings when the file is ambiguous;
-- add tests or benchmark coverage for the format.
+Keep `SKILL.md` focused on orchestration. Put deterministic transformations and validation in scripts or core tools. State trigger conditions in frontmatter, define outputs and guardrails, and add an eval case. Run the repository validator and the Skills validator before review.
 
-Please do not commit private sample names, lab names, operator names, file paths,
-project names, or unpublished research details.
+### Evaluation case
 
-## Benchmark Contributions
+Classify it correctly:
 
-Benchmark cases should include:
+- synthetic fixtures test regression and edge cases;
+- public real-world cases test transparent scientific performance;
+- governed hidden cases test generalization and resist overfitting.
 
-- instrument type and wavelength if known;
-- expected primary phase and possible secondary phases;
-- known artifacts such as substrate peaks, preferred orientation, broadening,
-  fluorescence, or low signal-to-noise;
-- a short explanation of why the case is useful.
+Record task definition, input license, consent/privacy review, expected output, scoring, subgroup/artifact labels, expert annotators, disagreements, and dataset version.
 
-Public or synthetic data is preferred. Real lab data must be approved by the lab
-before release.
+### Schema or shared contract
 
-## Reference Pattern Contributions
+Open an RFC for changes that affect more than one plugin or repository. Include compatibility, migration, and evaluation plans. Additive experimental fields may land under a pre-1.0 namespace; breaking stable changes require a version increment.
 
-Reference patterns should include provenance:
+### Recipe
 
-- database or publication source;
-- radiation wavelength assumption;
-- peak list and relative intensities;
-- notes on polymorph, space group, or common ambiguity.
+A recipe must declare inputs, immutable versions, commands, expected artifacts, validation steps, and a complete Evidence Bundle. It should run without access to private SciPhys services.
 
-## Pull Request Checklist
+## Scientific contribution checklist
 
-- `pnpm test` passes.
-- New behavior is covered by a fixture, benchmark, or focused test.
-- README or docs are updated when user-facing behavior changes.
-- No private lab data or sensitive metadata is included.
+- Raw inputs remain unchanged and are hashed.
+- Units, calibration, parameters, software versions, and uncertainty are explicit.
+- Results distinguish observations, derived values, interpretations, and hypotheses.
+- Central claims link to evidence nodes.
+- Alternative explanations and failure modes are documented.
+- Test data and references have redistributable licenses and provenance.
+- Private sample, operator, lab, project, and path metadata has been removed.
+- Automated checks and domain-expert judgments are clearly separated.
 
-## Community Standard
+## Pull request expectations
 
-Be precise, evidence-oriented, and respectful. Scientific disagreement is
-welcome; unsupported certainty is not.
+- Keep each pull request focused on one capability or contract.
+- Add or update tests/evals before claiming better scientific performance.
+- Report limitations and incompatible vendor variants.
+- Update user-facing docs and migration notes when contracts change.
+- Do not describe synthetic self-generated fixtures as an external benchmark.
+
+Maintainers review software quality, contract compatibility, evidence traceability, data rights, and scientific validity separately. A change may pass CI and still need domain review.
+
+## Governance
+
+The acceptance path is documented in [docs/GOVERNANCE.md](docs/GOVERNANCE.md). Use [rfcs/0000-template.md](rfcs/0000-template.md) for cross-cutting changes and [DATA_LICENSES.md](DATA_LICENSES.md) for data requirements.

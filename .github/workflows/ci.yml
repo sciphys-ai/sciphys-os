@@ -5,23 +5,47 @@ on:
   push:
     branches: [main]
 
+permissions:
+  contents: read
+
 jobs:
-  test:
+  validate:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
-          node-version: 20
+          python-version: "3.12"
+      - name: Validate repository contracts
+        run: python scripts/validate-repository.py
+      - name: Validate agent skills
+        run: |
+          python - <<'PY'
+          import pathlib, re, sys
+          failed = False
+          for path in pathlib.Path("skills").glob("*/SKILL.md"):
+              text = path.read_text(encoding="utf-8")
+              if not re.match(r"^---\nname: [a-z0-9-]+\ndescription: .+\n---\n", text):
+                  print(f"Invalid skill frontmatter: {path}")
+                  failed = True
+          raise SystemExit(1 if failed else 0)
+          PY
 
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Run benchmark tests
-        run: pnpm test
+  test:
+    needs: validate
+    strategy:
+      matrix:
+        node-version: [20, 22]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
+      - name: Smoke-test CLI
+        run: |
+          node dist/scripts/sciphys.js xrd inspect examples/zno.xy
+          node dist/scripts/sciphys.js evidence validate examples/evidence-bundle.example.json

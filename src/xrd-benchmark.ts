@@ -66,7 +66,12 @@ export type XRDBenchmarkSummary = {
 
 const CU_K_ALPHA_WAVELENGTH_A = 1.5406
 
-export const XRD_BENCHMARK_CASES: readonly XRDBenchmarkCase[] = [
+/**
+ * Synthetic regression cases generated from the same curated reference
+ * library used by the matcher. These cases protect deterministic behavior;
+ * they are not an external scientific accuracy benchmark.
+ */
+export const XRD_SYNTHETIC_REGRESSION_CASES: readonly XRDBenchmarkCase[] = [
   {
     id: "zno-wurtzite-clean",
     name: "ZnO wurtzite clean powder",
@@ -169,7 +174,7 @@ export const XRD_BENCHMARK_CASES: readonly XRDBenchmarkCase[] = [
 ]
 
 export function runXRDBenchmark(
-  cases: readonly XRDBenchmarkCase[] = XRD_BENCHMARK_CASES,
+  cases: readonly XRDBenchmarkCase[] = XRD_SYNTHETIC_REGRESSION_CASES,
   library: readonly XRDReferencePhase[] = BUILTIN_XRD_REFERENCE_PHASES,
 ): XRDBenchmarkSummary {
   const results = cases.map((testCase) => evaluateXRDBenchmarkCase(testCase, library))
@@ -192,6 +197,9 @@ export function runXRDBenchmark(
     results,
   }
 }
+
+/** @deprecated Use XRD_SYNTHETIC_REGRESSION_CASES. */
+export const XRD_BENCHMARK_CASES = XRD_SYNTHETIC_REGRESSION_CASES
 
 export function evaluateXRDBenchmarkCase(
   testCase: XRDBenchmarkCase,

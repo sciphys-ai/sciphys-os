@@ -1,44 +1,55 @@
-# SciPhys OS Roadmap
+# SciPhys OS roadmap
 
-SciPhys OS is building the open scientific data layer for experimental materials
-and physics research.
+The roadmap prioritizes reusable infrastructure and measured scientific trust over the raw number of Skills or supported file extensions.
 
-## P0: Trustworthy XRD Core
+## Stage 0 — Contract foundation (now)
 
-- Expand parser coverage for Bruker, Rigaku, PANalytical, Malvern, and common
-  ASCII exports.
-- Build a benchmark suite for single phase, multiphase, impurity, low
-  signal-to-noise, broad peak, preferred orientation, and substrate cases.
-- Make phase matching evidence-first: matched peaks, unmatched peaks, missing
-  strong references, candidate ambiguity, and confidence rationale.
-- Improve CIF parsing, structure factor generation, profile fitting, and
-  refinement diagnostics.
+- Evidence Bundle v0.1 with claims, provenance, hashes, and expert review.
+- Plugin manifest and registry for instrument capabilities.
+- Four cross-cutting Skills: analyze, figure, write, audit.
+- XRD CLI vertical slice and honest synthetic regression suite.
+- Versioned schemas, evaluation policy, governance, and repository validation.
 
-## P1: Open Scientific Data Schema
+Exit criterion: a new instrument adapter can join without changing the Skill or Evidence Bundle contracts.
 
-- Define stable schemas for sample, project, instrument, measurement, analysis
-  result, provenance, expert feedback, and publication export.
-- Provide JSON Schema and TypeScript types.
-- Support export/import between SciPhys.ai, notebooks, and lab archives.
+## Stage 1 — XRD reference implementation
 
-## P2: Multimodal Experimental Workflows
+- Broader vendor/version fixtures and strict format diagnostics.
+- Traceable peak detection, matching, fitting, uncertainty, and alternative candidates.
+- Licensed real-world benchmark split by phase complexity and acquisition artifact.
+- End-to-end ZnO recipe producing normalized data, figure, claim ledger, and Evidence Bundle.
 
-- Add Raman peak fitting and reference matching.
-- Add SEM/AFM metadata and image-analysis fixtures.
-- Add battery health data examples and benchmark tasks.
-- Add notebook recipes for cross-measurement reasoning.
+Exit criterion: independent labs can reproduce benchmark scores and inspect every central claim.
 
-## P3: Community Benchmark and Leaderboard
+## Stage 2 — Second and third modalities
 
-- Publish DOI-backed benchmark snapshots.
-- Track parser compatibility and phase-identification accuracy.
-- Accept community submissions with transparent provenance.
-- Make expert corrections auditable and reusable.
+- Raman as the first spectral plugin and electrochemistry as the first time-series plugin.
+- Shared spectroscopy/time-series primitives where scientifically justified.
+- SEM/AFM metadata and image-artifact contracts before model-heavy interpretation.
+- Cross-measurement recipes with explicit sample identity and alignment provenance.
 
-## What Stays Commercial
+Exit criterion: common orchestration and evidence layers are reused unchanged across at least three modality families.
 
-The hosted SciPhys.ai product focuses on private lab workspaces, permissions,
-AI analysis agents, expert review loops, organization dashboards, and secure
-data collaboration.
+## Stage 3 — Community evaluation network
 
-The open project focuses on formats, parsers, benchmarks, and evidence logic.
+- DOI-backed public dataset snapshots and immutable evaluation manifests.
+- Governed hidden test sets with transparent stewardship and conflict-of-interest rules.
+- Reference baselines, uncertainty-aware scoring, subgroup reports, and reproducibility checks.
+- Signed submissions and public result artifacts instead of an opaque leaderboard number.
+
+Exit criterion: outside teams submit plugins and reproduce results without maintainer intervention.
+
+## Stage 4 — Sustainable ecosystem
+
+- Stable v1 contracts with deprecation windows and migration tooling.
+- Maintainer ladder, domain working groups, reviewer recognition, and funded data curation.
+- Hosted private evaluation, collaboration, compute, and expert review built on portable open artifacts.
+
+Exit criterion: independent maintainers own major modalities and the open protocol remains useful without the hosted product.
+
+## What we will not optimize for
+
+- Inflating Skill count with near-duplicate prompts.
+- Claiming instrument support from a single happy-path file.
+- Ranking systems on synthetic data presented as real-world validation.
+- Hiding provenance, uncertainty, or benchmark methodology for marketing convenience.

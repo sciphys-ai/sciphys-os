@@ -1,0 +1,4 @@
+interface:
+  display_name: "Make Scientific Figure"
+  short_description: "Build data-linked publication figures"
+  default_prompt: "Use $make-scientific-figure to create a publication-ready figure linked to its source data."

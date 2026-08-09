@@ -1,0 +1,4 @@
+interface:
+  display_name: "Analyze Instrument Data"
+  short_description: "Turn raw instrument files into auditable evidence"
+  default_prompt: "Use $analyze-instrument-data to inspect these instrument files and build a traceable evidence package."
