@@ -1,21 +1,33 @@
 {
   "name": "sciphys-os",
-  "version": "0.1.0",
-  "description": "Open scientific data parsers, benchmarks, and XRD analysis primitives from SciPhys.",
+  "version": "0.2.0",
+  "description": "Open agent runtime, skills, evidence standards, and instrument analysis primitives for experimental science.",
   "packageManager": "pnpm@9.15.9",
   "license": "Apache-2.0",
   "type": "commonjs",
   "main": "dist/src/index.js",
   "types": "dist/src/index.d.ts",
+  "bin": {
+    "sciphys": "dist/scripts/sciphys.js"
+  },
   "files": [
     "dist",
+    "docs",
+    "examples",
+    "registry",
+    "skills",
+    "specs",
     "README.md",
     "LICENSE"
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
-    "benchmark:xrd": "pnpm build && node dist/scripts/xrd-benchmark.js",
-    "test": "pnpm benchmark:xrd"
+    "regression:xrd": "pnpm build && node dist/scripts/xrd-benchmark.js",
+    "regression:evidence": "pnpm build && node dist/scripts/evidence-regression.js",
+    "regression:plugin": "pnpm build && node dist/scripts/plugin-regression.js",
+    "benchmark:xrd": "pnpm regression:xrd",
+    "validate:repo": "python scripts/validate-repository.py",
+    "test": "pnpm build && node dist/scripts/xrd-benchmark.js && node dist/scripts/evidence-regression.js && node dist/scripts/plugin-regression.js"
   },
   "repository": {
     "type": "git",

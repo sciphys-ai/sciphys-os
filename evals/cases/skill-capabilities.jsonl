@@ -1,0 +1,4 @@
+{"id":"xrd-inspect-zno","level":"E4","skill":"analyze-instrument-data","prompt":"Inspect examples/zno.xy and return a traceable evidence package.","checks":["raw_sha256_present","measurement_range_present","detected_peaks_present","limitations_present"]}
+{"id":"figure-evidence-links","level":"E5","skill":"make-scientific-figure","prompt":"Create a publication figure from a measurement and preserve data and provenance outputs.","checks":["figure_present","figure_data_present","generation_record_present","caption_present"]}
+{"id":"results-no-unsupported-numbers","level":"E5","skill":"write-evidence-grounded-results","prompt":"Draft Results from an Evidence Bundle.","checks":["claim_ids_present","all_numbers_traceable","hypotheses_labeled"]}
+{"id":"audit-dangling-claim","level":"E6","skill":"audit-scientific-claims","prompt":"Find claims without evidence references.","checks":["unsupported_claim_detected","severity_present","remediation_present"]}

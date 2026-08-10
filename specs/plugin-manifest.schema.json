@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.sciphys.org/plugin-manifest/v0.1.json",
+  "title": "SciPhys Plugin Manifest v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocolVersion", "id", "version", "kind", "status", "maintainers", "capabilities", "runtime", "operations", "license"],
+  "properties": {
+    "protocolVersion": { "const": "sciphys.plugin.v0.1" },
+    "id": { "type": "string", "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$" },
+    "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+(?:-[0-9A-Za-z.-]+)?$" },
+    "kind": { "enum": ["adapter", "primitive", "technique", "skill", "exporter"] },
+    "status": { "enum": ["experimental", "community-verified", "stable", "certified", "deprecated"] },
+    "techniques": { "type": "array", "items": { "type": "string", "minLength": 1 } },
+    "modalities": { "type": "array", "items": { "enum": ["signal-1d", "time-series", "raster-2d", "volume-3d", "structure", "tabular"] } },
+    "vendors": { "type": "array", "items": { "type": "string" } },
+    "formats": { "type": "array", "items": { "type": "string" } },
+    "maintainers": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name"],
+        "properties": {
+          "name": { "type": "string", "minLength": 1 },
+          "orcid": { "type": "string" },
+          "github": { "type": "string" }
+        }
+      }
+    },
+    "capabilities": { "type": "array", "minItems": 1, "uniqueItems": true, "items": { "type": "string", "minLength": 1 } },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "entrypoint"],
+      "properties": {
+        "kind": { "enum": ["node", "python", "wasm", "container", "external"] },
+        "entrypoint": { "type": "string", "minLength": 1, "description": "Entrypoint path relative to the manifest file." },
+        "engine": { "type": "string" }
+      }
+    },
+    "operations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["id", "capability", "handler", "deterministic"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^[a-z0-9]+(?:[.-][a-z0-9]+)*$" },
+          "capability": { "type": "string", "minLength": 1 },
+          "handler": { "type": "string", "minLength": 1 },
+          "deterministic": { "type": "boolean" },
+          "inputSchema": { "type": "string" },
+          "outputSchema": { "type": "string" }
+        }
+      }
+    },
+    "fixtures": { "type": "array", "items": { "type": "string" } },
+    "methodReferences": { "type": "array", "items": { "type": "string" } },
+    "license": { "type": "string", "minLength": 1 },
+    "dataLicense": { "type": "string" }
+  }
+}

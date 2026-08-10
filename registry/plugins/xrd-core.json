@@ -1,0 +1,27 @@
+{
+  "protocolVersion": "sciphys.plugin.v0.1",
+  "id": "sciphys.xrd.core",
+  "version": "0.2.0",
+  "kind": "technique",
+  "status": "experimental",
+  "techniques": ["xrd"],
+  "modalities": ["signal-1d", "structure"],
+  "vendors": ["Bruker", "Rigaku", "PANalytical"],
+  "formats": ["txt", "xy", "csv", "raw-v3", "raw-v4", "xrdml"],
+  "maintainers": [{ "name": "SciPhys AI contributors", "github": "sciphys-ai" }],
+  "capabilities": ["parse", "detect-peaks", "match-reference-phases", "fit-profile", "preview-refinement"],
+  "runtime": {
+    "kind": "node",
+    "entrypoint": "../../dist/src/index.js",
+    "engine": ">=20.9.0"
+  },
+  "operations": [
+    { "id": "parse", "capability": "parse", "handler": "parseXRD", "deterministic": true },
+    { "id": "detect-peaks", "capability": "detect-peaks", "handler": "detectPeaks", "deterministic": true },
+    { "id": "match-reference-phases", "capability": "match-reference-phases", "handler": "identifyReferencePhases", "deterministic": true },
+    { "id": "fit-profile", "capability": "fit-profile", "handler": "fitPseudoVoigt", "deterministic": true },
+    { "id": "preview-refinement", "capability": "preview-refinement", "handler": "buildRefinementPreview", "deterministic": true }
+  ],
+  "fixtures": ["../../examples/zno.xy"],
+  "license": "Apache-2.0"
+}

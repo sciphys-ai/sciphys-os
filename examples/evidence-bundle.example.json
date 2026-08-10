@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "sciphys.evidence-bundle.v0.1",
+  "id": "example-zno-xrd",
+  "createdAt": "2026-08-10T00:00:00Z",
+  "nodes": [
+    {
+      "id": "raw:zno.xy",
+      "type": "raw-data",
+      "label": "ZnO powder XRD pattern",
+      "contentHash": "b318cb947a0fc8a07db64bb80e38462c7fdc2de713e55ed0d5ff97226d7830c1",
+      "uri": "./zno.xy",
+      "mediaType": "text/plain"
+    },
+    {
+      "id": "process:parse-xrd",
+      "type": "process",
+      "label": "Parse two-column XRD data",
+      "metadata": { "implementation": "sciphys-os", "version": "0.2.0" }
+    },
+    {
+      "id": "result:peak-list",
+      "type": "result",
+      "label": "Detected XRD peaks"
+    }
+  ],
+  "edges": [
+    { "from": "raw:zno.xy", "to": "process:parse-xrd", "relation": "used" },
+    { "from": "process:parse-xrd", "to": "result:peak-list", "relation": "generated" }
+  ],
+  "claims": [
+    {
+      "id": "claim:major-peaks",
+      "text": "The pattern contains the principal reflections expected for wurtzite ZnO.",
+      "kind": "derived-result",
+      "evidenceRefs": ["result:peak-list"],
+      "status": "draft"
+    }
+  ],
+  "reviews": []
+}

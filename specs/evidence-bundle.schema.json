@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://schemas.sciphys.org/evidence-bundle/v0.1.json",
+  "x-sciphys-source": "https://github.com/sciphys-ai/sciphys-formats/blob/main/schemas/evidence-bundle.v0.1.schema.json",
+  "title": "SciPhys Evidence Bundle v0.1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["schemaVersion", "id", "createdAt", "nodes", "edges", "claims"],
+  "properties": {
+    "schemaVersion": { "const": "sciphys.evidence-bundle.v0.1" },
+    "id": { "type": "string", "minLength": 1 },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "nodes": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/node" }
+    },
+    "edges": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/edge" }
+    },
+    "claims": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/claim" }
+    },
+    "reviews": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/review" }
+    }
+  },
+  "$defs": {
+    "node": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "type", "label"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "type": { "enum": ["raw-data", "measurement", "process", "result", "artifact", "reference"] },
+        "label": { "type": "string", "minLength": 1 },
+        "contentHash": { "type": "string", "pattern": "^(sha256:)?[a-fA-F0-9]{64}$" },
+        "uri": { "type": "string" },
+        "mediaType": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" },
+        "metadata": { "type": "object" }
+      }
+    },
+    "edge": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["from", "to", "relation"],
+      "properties": {
+        "from": { "type": "string" },
+        "to": { "type": "string" },
+        "relation": { "enum": ["used", "generated", "derived-from", "supports", "contradicts", "supersedes"] },
+        "rationale": { "type": "string" }
+      }
+    },
+    "claim": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "text", "kind", "evidenceRefs"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "text": { "type": "string", "minLength": 1 },
+        "kind": { "enum": ["observation", "derived-result", "interpretation", "hypothesis"] },
+        "evidenceRefs": { "type": "array", "items": { "type": "string" } },
+        "status": { "enum": ["draft", "supported", "contested", "rejected"] }
+      }
+    },
+    "review": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "targetRef", "decision"],
+      "properties": {
+        "id": { "type": "string", "minLength": 1 },
+        "targetRef": { "type": "string", "minLength": 1 },
+        "decision": { "enum": ["accept", "revise", "reject"] },
+        "reviewer": { "type": "string" },
+        "rationale": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      }
+    }
+  }
+}

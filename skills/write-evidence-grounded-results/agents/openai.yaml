@@ -1,0 +1,4 @@
+interface:
+  display_name: "Write Evidence-Grounded Results"
+  short_description: "Draft Results from verified evidence only"
+  default_prompt: "Use $write-evidence-grounded-results to draft a Results section from this evidence package."
