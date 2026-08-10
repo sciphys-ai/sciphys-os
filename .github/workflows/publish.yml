@@ -58,3 +58,75 @@ jobs:
       - name: Publish with npm trusted publishing
         if: github.event_name == 'release'
         run: npm publish --access public
+
+  github-packages:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Check out the release source
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.release.tag_name || github.ref }}
+
+      - name: Set up Node.js for GitHub Packages
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version: "24.14.0"
+          registry-url: "https://npm.pkg.github.com"
+          scope: "@sciphys-ai"
+          package-manager-cache: false
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.12"
+
+      - name: Enable pnpm
+        run: corepack enable
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Install current npm CLI
+        run: npm install --global npm@11.19.0
+
+      - name: Verify release tag
+        if: github.event_name == 'release'
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: node scripts/verify-release-tag.cjs "$RELEASE_TAG"
+
+      - name: Validate package candidate
+        run: |
+          pnpm validate:repo
+          pnpm test
+
+      - name: Prepare the GitHub Packages identity
+        run: >-
+          node -e
+          "const fs=require('fs');
+          const p=require('./package.json');
+          p.name='@sciphys-ai/sciphys-os';
+          p.publishConfig={...p.publishConfig,registry:'https://npm.pkg.github.com/',provenance:false};
+          fs.writeFileSync('package.json',JSON.stringify(p,null,2)+'\\n');"
+
+      - name: Check whether this version is already published
+        id: github-package
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
+        run: |
+          package_version="$(node -p "require('./package.json').version")"
+          if npm view "@sciphys-ai/sciphys-os@$package_version" version --registry=https://npm.pkg.github.com >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish to GitHub Packages
+        if: steps.github-package.outputs.exists != 'true'
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm publish --access public
