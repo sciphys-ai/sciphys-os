@@ -22,6 +22,7 @@
   ],
   "scripts": {
     "build": "tsc -p tsconfig.json",
+    "prepublishOnly": "pnpm validate:repo && pnpm test",
     "regression:xrd": "pnpm build && node dist/scripts/xrd-benchmark.js",
     "regression:evidence": "pnpm build && node dist/scripts/evidence-regression.js",
     "regression:plugin": "pnpm build && node dist/scripts/plugin-regression.js",
@@ -31,12 +32,17 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+ssh://git@github.com/sciphys-ai/sciphys-os.git"
+    "url": "git+https://github.com/sciphys-ai/sciphys-os.git"
   },
   "bugs": {
     "url": "https://github.com/sciphys-ai/sciphys-os/issues"
   },
   "homepage": "https://github.com/sciphys-ai/sciphys-os#readme",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true,
+    "registry": "https://registry.npmjs.org/"
+  },
   "engines": {
     "node": ">=20.9.0",
     "pnpm": ">=9"
