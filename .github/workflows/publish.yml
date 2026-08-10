@@ -4,6 +4,12 @@ on:
   release:
     types: [published]
   workflow_dispatch:
+    inputs:
+      publish_npmjs:
+        description: Publish to npmjs after the package ownership bootstrap exists
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: read
@@ -55,8 +61,26 @@ jobs:
           pnpm test
           npm publish --dry-run --access public
 
+      - name: Check npmjs package ownership bootstrap
+        id: npmjs-package
+        shell: bash
+        run: |
+          if npm view sciphys-os version --registry=https://registry.npmjs.org >/dev/null 2>&1; then
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Report pending npmjs ownership bootstrap
+        if: steps.npmjs-package.outputs.exists != 'true'
+        run: >-
+          echo "::warning title=npmjs ownership bootstrap pending::
+          sciphys-os does not exist on npmjs yet; GitHub Release and GitHub Packages remain publishable."
+
       - name: Publish with npm trusted publishing
-        if: github.event_name == 'release'
+        if: >-
+          steps.npmjs-package.outputs.exists == 'true' &&
+          (github.event_name == 'release' || inputs.publish_npmjs)
         run: npm publish --access public
 
   github-packages:
